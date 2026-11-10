@@ -3,6 +3,8 @@
 > **一句话**：给一句中文问题，Agent 自己写 SQL 去查库、跑错了自己改、最后交回答案和那句可审计的 SQL。
 > 这个项目真正花时间的不是把它跑通，而是搞清楚**它什么时候会悄悄答错，以及我凭什么相信自己的结论**。
 
+**在线看**：[一页纸项目介绍](https://futtco.github.io/text2sql-agent/) · [GitHub 仓库](https://github.com/futtco/text2sql-agent) · [简历正文](RESUME.md)
+
 Python / SQLite / Function Calling 的命令行项目，**没有网页界面，不是一个 App**。
 代码和实验已完成，所有结论都留在 `NOTES.md` 里，每个数字都能查到出处。
 
