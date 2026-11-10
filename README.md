@@ -97,10 +97,16 @@ SQL 跑得通、库不报错、看上去毫无破绽 —— 这套评测主要�
 
 ## 运行
 
-环境：Python 3.9+，第三方库只要 `openai` 和 `python-dotenv`，其余均为标准库。
+环境：Python 3.9+。只有 `demo.py` 不需要安装任何第三方库；其余脚本需要：
 
 ```bash
-python demo.py                      # 三道真题回放，0 次 API
+pip install openai python-dotenv
+```
+
+注意装依赖和运行时要用同一个 Python（用 conda / venv 时尤其容易弄混）。
+
+```bash
+python demo.py                      # 三道真题回放，0 次 API、0 依赖
 python 07_test_offline.py           # 23 项离线单测
 python 09_test_schema.py            # 提示词一致性 / 防泄题
 python 10_analyze.py resultaudit    # 分层 + 机制 + 判分重放，读已有证据
