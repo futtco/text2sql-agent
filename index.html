@@ -168,11 +168,13 @@ WHERE p.launched_at &gt;= '2026-08-01';   -- 语法完全正确，数据库一�
   <h2>怎么跑</h2>
   <p class="sub">零成本演示不需要密钥、不联网、不改任何文件；真跑模型才需要 <code>.env</code>，新产物自动写入 <code>evidence/</code>。</p>
 <pre>python demo.py                    # 三道真题回放：答对 / 悄悄答错 / 假修复
+python chat.py "库里有多少个商品？"  # 自己提问，实时看每一轮查库（需要 key）
 python 07_test_offline.py         # 23 项离线单测
 python 09_test_schema.py          # 提示词一致性 / 防泄题
 python 10_analyze.py resultaudit  # 分层 + 机制 + 判分重放
 
 python 03b_batch_eval.py A1       # 现场跑一道题（需要 key，会花一点额度）</pre>
+  <p class="sub" style="margin-top:12px"><code>chat.py</code> 会逐轮打印模型决定写哪句 SQL、数据库返回什么、何时停止查库；不写 trace、不判分，只用于展示链路。</p>
   <div style="margin-top:16px">
     <span class="pill">Python 3.9+</span><span class="pill">openai</span><span class="pill">python-dotenv</span>
     <span class="pill">默认模型 glm-4-flash（免费）</span><span class="pill">EVAL_MODEL 可换模型，判卷代码不动</span>
@@ -195,6 +197,7 @@ python 03b_batch_eval.py A1       # 现场跑一道题（需要 key，会花一�
   <a href="RESUME.md">RESUME.md 项目描述</a>
   <a href="NOTES.md">NOTES.md 36 节实验记录</a>
   <a href="demo.py">demo.py 演示脚本</a>
+  <a href="chat.py">chat.py 交互问答</a>
   <br><br>
   完整实验记录见 NOTES.md；原始 trace / 日志 / 汇总集中在 evidence/ 目录。
 </footer>
