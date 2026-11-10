@@ -1,0 +1,20 @@
+# ⚠️ 真实密钥，永远不要提交
+.env
+.env.local
+*_key.txt
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 说明：shop.db / cases.json / trace_*.jsonl / log_*.txt / runs_summary.jsonl
+# 都是评测证据，属于项目资产，故意保留在仓库里。
