@@ -25,6 +25,17 @@ python demo.py          # 不联网、不花一分钱、不改任何文件
 
 单看一道题用 `python demo.py B5`；`python demo.py --list` 列出全部 50 个可回放题号。
 
+想自己提问而不是看回放，进交互模式（需要 `.env` 里的 key 和下方「运行」里那两个第三方库）：
+
+```bash
+python chat.py                          # 进入对话，输入 quit 退出
+python chat.py "库里一共有多少个商品？"   # 只问一句就退出
+```
+
+它会实时打印模型每一轮决定写哪句 SQL、数据库返回了什么、什么时候停止查库并作答。
+交互模式不写 trace、不判分，只用于展示链路；评测结果一律以 `03b_batch_eval.py` 为准。
+模型若跳过工具直接作答，脚本会打回最多两次——这也是项目归因出的失败形态之一。
+
 ---
 
 ## 工作方式
@@ -107,6 +118,7 @@ pip install openai python-dotenv
 
 ```bash
 python demo.py                      # 三道真题回放，0 次 API、0 依赖
+python chat.py "库里一共有多少个商品？" # 自己提问，实时看 Agent 每一轮（需要 key）
 python 07_test_offline.py           # 23 项离线单测
 python 09_test_schema.py            # 提示词一致性 / 防泄题
 python 10_analyze.py resultaudit    # 分层 + 机制 + 判分重放，读已有证据
