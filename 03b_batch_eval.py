@@ -64,7 +64,8 @@ client = OpenAI(
 
 DB = "shop.db"
 CASES_FILE = "cases.json"
-TRACE_FILE = "trace_shop_after.jsonl"   # 每遍运行前重新赋值
+EVIDENCE = "evidence"          # 新产生的 trace / 汇总统一写进这个目录
+TRACE_FILE = "trace_shop_after.jsonl"   # 每遍运行前重新赋值（自动加上 EVIDENCE 前缀）
 MAX_ROUNDS = 6
 MAX_ROWS = 20          # run_sql 最多回显 20 行，防止模型 SELECT * 把上下文撑爆
 
@@ -149,7 +150,7 @@ SELF_CHECK_MORE_MSG = ("收口检查没通过：{reason}。"
 # 换模型跑对照：EVAL_MODEL=glm-4-plus python 03b_batch_eval.py
 # 注意：只换这里，judge() 用的判卷模型不动，否则判定标准跟着变，数据不可比。
 MODEL = os.getenv("EVAL_MODEL", "glm-4-flash")
-RUNS_SUMMARY = "runs_summary.jsonl"
+RUNS_SUMMARY = os.path.join(EVIDENCE, "runs_summary.jsonl")
 
 NUDGE_MSG_AFTER = ("库里有回答这道题所需的数据。不要直接说做不到，"
                    "请调用 run_sql 查询后再回答。")
@@ -966,7 +967,8 @@ def run_batch(cases, mode, trace_name, *, baseline_nudge=None, derive=False,
         DEDUP = dedup
     if sqlguard is not None:
         SQL_GUARD = sqlguard
-    TRACE_FILE = trace_name
+    os.makedirs(EVIDENCE, exist_ok=True)
+    TRACE_FILE = os.path.join(EVIDENCE, os.path.basename(trace_name))
     open(TRACE_FILE, "w", encoding="utf-8").close()
 
     rows = []

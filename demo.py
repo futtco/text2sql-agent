@@ -22,8 +22,17 @@ except AttributeError:
     pass
 
 BASE = os.path.dirname(os.path.abspath(__file__))
+EVIDENCE = "evidence"          # 全部历史 trace 统一放在这个目录
 BY_ID = {c["id"]: c for c in json.load(
     open(os.path.join(BASE, "cases.json"), encoding="utf-8"))["cases"]}
+
+
+def _path(name):
+    """证据文件优先在 evidence/ 找；兼容旧版本放在根目录的情况。"""
+    p = os.path.join(BASE, name)
+    if os.path.exists(p):
+        return p
+    return os.path.join(BASE, EVIDENCE, name)
 
 # 三道演示题，全部来自真实运行的 trace 文件，不是编出来的例子
 TOUR = [
@@ -41,13 +50,16 @@ TOUR_MAP = {q: (path, note) for q, path, note in TOUR}
 
 
 def load_trace(path):
-    with open(os.path.join(BASE, path), encoding="utf-8") as f:
+    with open(_path(path), encoding="utf-8") as f:
         return [json.loads(line) for line in f if line.strip()]
 
 
 def all_traces():
-    return sorted(os.path.basename(p) for p in
-                  glob.glob(os.path.join(BASE, "trace_*.jsonl")))
+    names = set()
+    for pattern in ("trace_*.jsonl", os.path.join(EVIDENCE, "trace_*.jsonl")):
+        names.update(os.path.basename(p) for p in
+                     glob.glob(os.path.join(BASE, pattern)))
+    return sorted(names)
 
 
 def find_file(qid):
@@ -95,7 +107,7 @@ def show(qid, path, note):
     print("=" * 72)
     print(f"【{qid}】{c['type']}题  ·  标准答案：{c['expect']}")
     print(f"问题：{c['q']}")
-    print(f"证据：{path}（真实运行记录，共 {len(recs)} 步）")
+    print(f"证据：{EVIDENCE}/{path}（真实运行记录，共 {len(recs)} 步）")
     print("-" * 72)
     for r in recs:
         step = f"  第 {r['round']} 轮  [{r['kind']}]"

@@ -13,16 +13,33 @@
 """
 import glob
 import json
+import os
 import re
 import sys
 from collections import Counter
 
 import schema_link  # noqa: F401  - 仅为让脚本与评测脚本同目录可独立运行
 
+EVIDENCE = "evidence"          # 全部历史 trace / log / 汇总统一放在这个目录
+
+
+def P(name):
+    """证据文件优先在 evidence/ 找；兼容旧版本放在根目录的情况。"""
+    if os.path.exists(name):
+        return name
+    return os.path.join(EVIDENCE, name)
+
+
+def G(pattern):
+    """同时在根目录和 evidence/ 里找证据文件，返回去重后的路径列表。"""
+    return sorted(set(glob.glob(pattern)) |
+                  set(glob.glob(os.path.join(EVIDENCE, pattern))))
+
+
 EXP = sys.argv[1] if len(sys.argv) > 1 else "selfcheck"
 WANT_ID = sys.argv[2] if len(sys.argv) > 2 else None
 
-rows = [json.loads(l) for l in open("runs_summary.jsonl", encoding="utf-8")]
+rows = [json.loads(l) for l in open(P("runs_summary.jsonl"), encoding="utf-8")]
 rows = [r for r in rows if r.get("experiment") == EXP]
 if not rows:
     sys.exit(f"runs_summary.jsonl 里没有 experiment={EXP} 的记录")
@@ -65,7 +82,7 @@ if EXP == "selfcheck":
 elif EXP == "resultaudit":
     # 实验十一：触发过体检的题 vs 工具返回逐字节相同的阴性对照
     fired = set()
-    for f in sorted(glob.glob(f"trace_ra_{rid}_*_after.jsonl")):
+    for f in G(f"trace_ra_{rid}_*_after.jsonl"):
         for line in open(f, encoding="utf-8"):
             r = json.loads(line)
             if "[结果体检]" in str(r.get("output", "")):
@@ -115,7 +132,7 @@ for mode in ("baseline", "after"):
 if EXP == "selfcheck":
     print("\n== 自评判缺后的 SQL（看机制有没有真的生效） ==")
     STATUS = ("status", "paid", "shipped")
-    for f in sorted(glob.glob(f"trace_sc_{rid}_*_after.jsonl")):
+    for f in G(f"trace_sc_{rid}_*_after.jsonl"):
         recs = [json.loads(l) for l in open(f, encoding="utf-8")]
         byq = {}
         for r in recs:
@@ -137,7 +154,7 @@ if EXP == "selfcheck":
 if EXP == "resultaudit":
     print("\n== 体检触发后的下一轮 SQL（看机制有没有真的生效） ==")
     FIXWORDS = ("1.0", "cast(", "coalesce", "left join", "ifnull", "real")
-    for f in sorted(glob.glob(f"trace_ra_{rid}_*_after.jsonl")):
+    for f in G(f"trace_ra_{rid}_*_after.jsonl"):
         recs = [json.loads(l) for l in open(f, encoding="utf-8")]
         byq = {}
         for r in recs:
@@ -163,7 +180,7 @@ if EXP == "resultaudit":
     spec = importlib.util.spec_from_file_location("ev", "03b_batch_eval.py")
     ev = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(ev)
-    logpath = sys.argv[3] if len(sys.argv) > 3 else "log_abRA_flash.txt"
+    logpath = P(sys.argv[3] if len(sys.argv) > 3 else "log_abRA_flash.txt")
     try:
         lines = open(logpath, encoding="utf-8").read().splitlines()
     except FileNotFoundError:
